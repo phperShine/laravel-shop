@@ -10,8 +10,8 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-
+//Laravel 自带了一个名为 verified 的中间件，如果一个未验证邮箱的用户尝试访问一个配置了 verified 中间件的路由，Laravel 就会提示该用户邮箱未激活。
 Route::get('/', 'PagesController@root')->name('root');
 
-Auth::routes();
+Auth::routes(['verify' => true]);
 
