@@ -4,6 +4,7 @@
  * Create by zhongzhong
  * Email  phperShine@163.com
  */
-function test_helper(){
-    return "ok!";
+function route_class()
+{
+    return str_replace('.', '-', Route::currentRouteName());
 }
