@@ -49,7 +49,7 @@ class ProductsController extends AdminController
 
         return $grid;
     }
-    
+
     /**
      * Make a form builder.
      *
