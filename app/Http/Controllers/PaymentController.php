@@ -71,6 +71,9 @@ class PaymentController extends Controller
         //其中 app('alipay')->success() 返回数据给支付宝，支付宝得到这个返回之后就认为我们已经处理好这笔订单，
         //不会再发生这笔订单的回调了。如果我们返回其他数据给支付宝，支付宝就会每隔一段时间就发送一次服务器端回调，
         //直到我们返回了正确的数据为准。
+
+        $this->afterPaid($order);
+
         return app('alipay')->success();
     }
 
@@ -118,6 +121,13 @@ class PaymentController extends Controller
             'payment_no'     => $data->transaction_id,
         ]);
 
+        $this->afterPaid($order);
+
         return app('wechat_pay')->success();
+    }
+
+    protected function afterPaid(Order $order)
+    {
+        event(new OrderPaid($order));
     }
 }
