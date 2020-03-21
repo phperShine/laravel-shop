@@ -36,9 +36,11 @@ Route::group(['middleware' => ['auth', 'verified']], function() {
     Route::post('orders', 'OrdersController@store')->name('orders.store');
     Route::get('orders', 'OrdersController@index')->name('orders.index');
     Route::get('orders/{order}', 'OrdersController@show')->name('orders.show');
-
+    Route::get('payment/{order}/alipay', 'PaymentController@payByAlipay')->name('payment.alipay');
+    Route::get('payment/alipay/return', 'PaymentController@alipayReturn')->name('payment.alipay.return');
 });
-
+//服务器端回调的路由不能放到带有 auth 中间件的路由组中，因为支付宝的服务器请求不会带有认证信息。
+Route::post('payment/alipay/notify', 'PaymentController@alipayNotify')->name('payment.alipay.notify');
 
 Route::redirect('/', '/products')->name('root');
 Route::get('products', 'ProductsController@index')->name('products.index');
