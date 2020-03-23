@@ -16,7 +16,7 @@ use App\Http\Requests\ApplyRefundRequest;
 use App\Exceptions\CouponCodeUnavailableException;
 use App\Models\CouponCode;
 use App\Http\Requests\CrowdFundingOrderRequest;
-
+use App\Events\OrderReviewed;
 use Illuminate\Http\Request;
 
 class OrdersController extends Controller
@@ -105,6 +105,7 @@ class OrdersController extends Controller
         return $order;
     }
 
+
     public function index(Request $request)
     {
         $orders = Order::query()
@@ -117,12 +118,14 @@ class OrdersController extends Controller
         return view('orders.index', ['orders' => $orders]);
     }
 
+
     public function show(Order $order, Request $request)
     {
         $this->authorize('own', $order);
 
         return view('orders.show', ['order' => $order->load(['items.productSku', 'items.product'])]);
     }
+
 
     public function received(Order $order, Request $request)
     {

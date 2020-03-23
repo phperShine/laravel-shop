@@ -10,6 +10,8 @@ use App\Events\OrderPaid;
 use App\Listeners\UpdateProductSoldCount;
 use App\Listeners\SendOrderPaidMail;
 use App\Listeners\UpdateCrowdfundingProductProgress;
+use App\Listeners\UpdateProductRating;
+use App\Events\OrderReviewed;
 
 class EventServiceProvider extends ServiceProvider
 {

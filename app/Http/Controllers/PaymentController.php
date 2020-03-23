@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Exceptions\InvalidRequestException;
 use Carbon\Carbon;
 use Endroid\QrCode\QrCode;
+use App\Events\OrderPaid;
 
 class PaymentController extends Controller
 {
