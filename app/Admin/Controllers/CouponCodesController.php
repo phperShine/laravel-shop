@@ -87,23 +87,46 @@ class CouponCodesController extends AdminController
 
     /**
      * Make a form builder.
-     *
+     *对于优惠码 code 字段，我们的第一个校验规则是 nullable，允许用户不填，不填的情况优惠码将由系统生成。
+     *对于折扣 value 字段，我们的校验规则是一个匿名函数，当我们的校验规则比较复杂，或者需要根据用户提交的其他字段来判断时就可以用匿名函数的方式来定义校验规则。
+     * $form->saving() 方法用来注册一个事件处理器，在表单的数据被保存前会被触发，这里我们判断如果用户没有输入优惠码，就通过 findAvailableCode() 来自动生成。
      * @return Form
      */
     protected function form()
     {
         $form = new Form(new CouponCode);
 
-        $form->text('name', __('Name'));
-        $form->text('code', __('Code'));
-        $form->text('type', __('Type'));
-        $form->decimal('value', __('Value'));
-        $form->number('total', __('Total'));
-        $form->number('used', __('Used'));
-        $form->decimal('min_amount', __('Min amount'));
-        $form->datetime('not_before', __('Not before'))->default(date('Y-m-d H:i:s'));
-        $form->datetime('not_after', __('Not after'))->default(date('Y-m-d H:i:s'));
-        $form->switch('enabled', __('Enabled'));
+        $form->display('id', 'ID');
+        $form->text('name', '名称')->rules('required');
+        $form->text('code', '优惠码')->rules(function($form) {
+            // 如果 $form->model()->id 不为空，代表是编辑操作
+            if ($id = $form->model()->id) {
+                return 'nullable|unique:coupon_codes,code,'.$id.',id';
+            } else {
+                return 'nullable|unique:coupon_codes';
+            }
+        });
+        $form->radio('type', '类型')->options(CouponCode::$typeMap)->rules('required')->default(CouponCode::TYPE_FIXED);
+        $form->text('value', '折扣')->rules(function ($form) {
+            if (request()->input('type') === CouponCode::TYPE_PERCENT) {
+                // 如果选择了百分比折扣类型，那么折扣范围只能是 1 ~ 99
+                return 'required|numeric|between:1,99';
+            } else {
+                // 否则只要大等于 0.01 即可
+                return 'required|numeric|min:0.01';
+            }
+        });
+        $form->text('total', '总量')->rules('required|numeric|min:0');
+        $form->text('min_amount', '最低金额')->rules('required|numeric|min:0');
+        $form->datetime('not_before', '开始时间');
+        $form->datetime('not_after', '结束时间');
+        $form->radio('enabled', '启用')->options(['1' => '是', '0' => '否']);
+
+        $form->saving(function (Form $form) {
+            if (!$form->code) {
+                $form->code = CouponCode::findAvailableCode();
+            }
+        });
 
         return $form;
     }
