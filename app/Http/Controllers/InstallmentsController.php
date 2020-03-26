@@ -254,6 +254,7 @@ class InstallmentsController extends Controller
             $item->update([
                 'refund_status' => InstallmentItem::REFUND_STATUS_SUCCESS,
             ]);
+            $item->installment->refreshRefundStatus();
            /* // 设定一个标志位
             $allSuccess = true;
             foreach ($item->installment->items as $item) {
